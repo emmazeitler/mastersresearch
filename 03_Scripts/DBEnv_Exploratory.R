@@ -108,7 +108,11 @@ db_data %>%
   summarize(mean=mean(hour2, na.rm=TRUE),
             median=median(latency2, na.rm = TRUE))
 
+#### Outliers ####
+library(outliers)
 
-
+grubbs.test(db_data$rem_no)
+ 
+grubbs.test(db_data$latency2)
 
 
