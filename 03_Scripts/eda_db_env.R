@@ -1,3 +1,17 @@
+
+## --------------- HEADER ------------------------------------------------------
+## Script eda_db_env.R
+## Author: Emma Zeitler, UF D.E.E.R. Lab
+## Department: Wildlife Ecology and Conservation
+## Affiliaton: University of Florida
+## Date Created: 2022-10-16
+## Contact: ezeitler@ufl.edu
+## Purpose of script: This script is an exploratory data analysis of experiments 
+## testing the effect of landscape changes associated with prescribed fire on 
+## dung beetle dung removal. 
+
+## --------------- SET—UP WORKSPACE --------------------------------------------
+
 library(tidyverse)
 library(lubridate)
 library(glmmTMB)
@@ -6,9 +20,11 @@ library(ggResidpanel)
 library(DHARMa)
 library(emmeans)
 library(MuMIn)
+library(outliers)
 
 db_data <- read.csv("02_Clean_data/Dungbeetle_Env_clean.csv")
 
+## --------------- CHECK DATA STRUCTURE ----------------------------------------
 str(db_data)
 summary(db_data)
 
@@ -16,6 +32,12 @@ summary(db_data)
 db_data$block_id <- as.factor(db_data$block_id)
 db_data$burn_season <- as.factor(db_data$burn_season)
 db_data$env_type <- as.factor(db_data$env_type)
+
+remno_adj <- db_data %>% 
+  select(date, block_id, burn_season, env_type, rem_no) %>% 
+  filter(rem_no > 0)
+
+## --------------- FILTER MISSING DATA ----------------------------------------
 
 # Filter NAs
 db_data$latency2 = gsub("NA", "", db_data$latency) %>% as.numeric()
@@ -25,7 +47,7 @@ remno_adj <- db_data %>%
   select(date, block_id, burn_season, env_type, rem_no) %>% 
   filter(rem_no > 0)
 
-#### Histograms #### 
+## --------------- HISTOGRAMS ------------------------------------------------
 
 # Removal event 
 ggplot(db_data, aes(x = rem_event)) + 
@@ -77,7 +99,7 @@ ggplot(db_data, aes(x = hour2)) +
   geom_histogram() +
   facet_wrap(~env_type) 
 
-#### Boxplots ####
+## --------------- BOXPLOTS ----------------------------------------
 
 ggplot(db_data, aes(y = rem_no)) +
   geom_boxplot() +
@@ -91,7 +113,7 @@ ggplot(db_data, aes(y = hour2)) +
   geom_boxplot() +
   facet_wrap(~env_type) 
 
-#### Summaries ####
+## --------------- SUMMARIES ----------------------------------------
 
 db_data %>% 
   group_by(env_type) %>% 
@@ -108,8 +130,7 @@ db_data %>%
   summarize(mean=mean(hour2, na.rm=TRUE),
             median=median(latency2, na.rm = TRUE))
 
-#### Outliers ####
-library(outliers)
+## --------------- FILTER OUTLIERS ----------------------------------------
 
 grubbs.test(db_data$rem_no)
  
