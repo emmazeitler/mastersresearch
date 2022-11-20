@@ -43,6 +43,8 @@ remno_adj <- db_data %>%
 db_data$latency2 = gsub("NA", "", db_data$latency) %>% as.numeric()
 db_data$hour2 = gsub("NA", "", db_data$hour) %>% as.numeric()
 
+db_data <- head(db_data, - 1)
+
 remno_adj <- db_data %>% 
   select(date, block_id, burn_season, env_type, rem_no) %>% 
   filter(rem_no > 0)
@@ -50,85 +52,86 @@ remno_adj <- db_data %>%
 ## --------------- HISTOGRAMS ------------------------------------------------
 
 # Removal event 
-ggplot(db_data, aes(x = rem_event)) + 
-  geom_histogram()
-
-ggplot(db_data, aes(x = rem_event)) + 
+ggplot(db_data, aes(x = rem_event, fill = env_type)) + 
   geom_histogram() +
-  facet_wrap(~env_type)
+  scale_fill_manual(values=c("#EE7733","#117733"))
+
+ggplot(db_data, aes(x = rem_event, fill = env_type)) + 
+  geom_histogram() +
+  facet_wrap(~env_type)+
+  scale_fill_manual(values=c("#EE7733","#117733"))
 
 # Removal number
-ggplot(db_data, aes(x = rem_no)) +
+ggplot(db_data, aes(x = rem_no, fill = env_type)) +
   geom_histogram()+ 
   geom_vline(aes(xintercept= mean(rem_no)), color = "blue", size = 2) +
-  geom_vline(aes(xintercept= median(rem_no)), color = "orange", size = 2)
+  geom_vline(aes(xintercept= median(rem_no)), color = "orange", size = 2)+
+  scale_fill_manual(values=c("#EE7733","#117733"))
 
-ggplot(db_data, aes(x = rem_no)) +
+ggplot(db_data, aes(x = rem_no, fill = env_type)) +
   geom_histogram() +
-  facet_wrap(~env_type)
+  facet_wrap(~env_type)+
+  scale_fill_manual(values=c("#EE7733","#117733"))
 
-ggplot(remno_adj, aes(x = rem_no)) +
+ggplot(remno_adj, aes(x = rem_no, fill = env_type)) +
   geom_histogram()+
-  geom_vline(aes(xintercept= mean(rem_no)), color = "blue", size = 2) +
-  geom_vline(aes(xintercept= median(rem_no)), color = "orange", size = 2) # Without 0s
+  scale_fill_manual(values=c("#EE7733","#117733"))
+  # geom_vline(aes(xintercept= mean(rem_no)), color = "blue", size = 2) +
+  # geom_vline(aes(xintercept= median(rem_no)), color = "orange", size = 2) # Without 0s
 
-ggplot(remno_adj, aes(x = rem_no)) +
+ggplot(remno_adj, aes(x = rem_no, fill = env_type)) +
   geom_histogram() +
-  facet_wrap(~env_type)
+  facet_wrap(~env_type)+
+  scale_fill_manual(values=c("#EE7733","#117733"))
 
 # Latency 
 
-ggplot(db_data, aes(x = latency2)) +
+ggplot(db_data, aes(x = latency2, fill = env_type)) +
   geom_histogram() +
   geom_vline(aes(xintercept= mean(latency2)), color = "blue", size = 2) +
-  geom_vline(aes(xintercept= median(latency2)), color = "orange", size = 2)
+  geom_vline(aes(xintercept= median(latency2)), color = "orange", size = 2)+
+  scale_fill_manual(values=c("#EE7733","#117733"))
 
-ggplot(db_data, aes(x = latency2)) +
+ggplot(db_data, aes(x = latency2, fill = env_type)) +
   geom_histogram() +
-  facet_wrap(~env_type)
+  facet_wrap(~env_type)+
+  scale_fill_manual(values=c("#EE7733","#117733"))
 
 # Hour
+ggplot(db_data, aes( x=hour2, fill=env_type)) +
+  geom_histogram()+
+  scale_fill_manual(values=c("#EE7733","#117733"))
 
-ggplot(db_data, aes(x = hour2)) +
-  geom_histogram() + 
-  geom_vline(aes(xintercept= mean(hour2)), color = "blue", size = 2) +
-  geom_vline(aes(xintercept= median(hour2)), color = "orange", size = 2)
-  
-
-ggplot(db_data, aes(x = hour2)) +
+ggplot(db_data, aes(x = hour2, fill = env_type)) +
   geom_histogram() +
-  facet_wrap(~env_type) 
-
-## --------------- BOXPLOTS ----------------------------------------
-
-ggplot(db_data, aes(y = rem_no)) +
-  geom_boxplot() +
-  facet_wrap(~env_type)
-
-ggplot(db_data, aes(y = latency2)) +
-  geom_boxplot() +
-  facet_wrap(~env_type) 
-
-ggplot(db_data, aes(y = hour2)) +
-  geom_boxplot() +
-  facet_wrap(~env_type) 
+  facet_wrap(~env_type)+
+  scale_fill_manual(values=c("#EE7733","#117733"))
 
 ## --------------- SUMMARIES ----------------------------------------
 
-db_data %>% 
+sum_remno <- db_data %>% 
   group_by(env_type) %>% 
-  summarize(mean=mean(rem_no, na.rm=TRUE),
-            median=median(rem_no, na.rm = TRUE))
+  summarize(min=min(rem_no, na.rm=TRUE),
+            max=max(rem_no, na.rm=TRUE),
+            mean=mean(rem_no, na.rm=TRUE),
+            median=median(rem_no, na.rm = TRUE),
+            sd=sd(rem_no, na.rm = TRUE))
 
-db_data %>% 
+sum_lat <- db_data %>% 
   group_by(env_type) %>% 
-  summarize(mean=mean(latency2, na.rm=TRUE),
-            median=median(latency2, na.rm = TRUE))
+  summarize(min=min(latency2, na.rm=TRUE),
+            max=max(latency2, na.rm=TRUE),
+            mean=mean(latency2, na.rm=TRUE),
+            median=median(latency2, na.rm=TRUE),
+            sd=sd(latency2, na.rm=TRUE))
 
-db_data %>% 
+sum_hour <- db_data %>% 
   group_by(env_type) %>% 
-  summarize(mean=mean(hour2, na.rm=TRUE),
-            median=median(latency2, na.rm = TRUE))
+  summarize(min=min(hour2, na.rm=TRUE),
+            max=max(hour2, na.rm=TRUE),
+            mean=mean(hour2, na.rm=TRUE),
+            median=median(latency2, na.rm = TRUE),
+            sd=sd(hour2, na.rm=TRUE))
 
 ## --------------- FILTER OUTLIERS ----------------------------------------
 
