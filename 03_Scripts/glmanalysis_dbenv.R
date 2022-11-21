@@ -84,6 +84,7 @@ emmeans(modLat, ~env_type, type = "response")
 #Removal event
 
 emRem <- emmeans(modRem1, ~env_type, type="response") %>% as.data.frame()
+write.csv(emRem, file = "dbenv_emmeans_remeventMod")
 
 ggplot(emRem, aes(x = env_type, y = prob)) +
   geom_point(aes(color=env_type), size=3) +
@@ -94,6 +95,7 @@ ggplot(emRem, aes(x = env_type, y = prob)) +
 #Removal amount
 
 emAmt <- emmeans(modRemNo, ~env_type, type="response") %>% as.data.frame()
+write.csv(emAmt, file = "dbenv_emmeans_remnoMod")
 
 ggplot(emAmt, aes(x = env_type, y = response)) +
   geom_point(aes(color=env_type), size=3) +
@@ -104,6 +106,7 @@ ggplot(emAmt, aes(x = env_type, y = response)) +
 #Latency
 
 emLat <- emmeans(modLat, ~env_type, type="response") %>% as.data.frame()
+write.csv(emLat, file = "dbenv_emmeans_remlatMod")
 
 ggplot(emLat, aes(x = env_type, y = emmean)) +
   geom_point(aes(color=env_type), size=3) +
