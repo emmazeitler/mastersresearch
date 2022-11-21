@@ -22,7 +22,7 @@ library(emmeans)
 library(MuMIn)
 library(outliers)
 
-db_data <- read.csv("02_Clean_data/Dungbeetle_Env_clean.csv")
+db_data <- read.csv("02_Clean_data/dbenv_clean.csv")
 
 ## --------------- CHECK DATA STRUCTURE ----------------------------------------
 str(db_data)
@@ -54,35 +54,49 @@ remno_adj <- db_data %>%
 # Removal event 
 ggplot(db_data, aes(x = rem_event, fill = env_type)) + 
   geom_histogram() +
-  scale_fill_manual(values=c("#EE7733","#117733"))
+  scale_fill_manual(values=c("#EE7733","#117733"))+
+  xlab("Ocurrence of removal event (binary)") +
+  ylab("Count")
 
 ggplot(db_data, aes(x = rem_event, fill = env_type)) + 
   geom_histogram() +
   facet_wrap(~env_type)+
-  scale_fill_manual(values=c("#EE7733","#117733"))
+  scale_fill_manual(values=c("#EE7733","#117733"))+
+  xlab("Ocurrence of removal event (binary)") +
+  ylab("Count")
 
 # Removal number
 ggplot(db_data, aes(x = rem_no, fill = env_type)) +
   geom_histogram()+ 
   geom_vline(aes(xintercept= mean(rem_no)), color = "blue", size = 2) +
   geom_vline(aes(xintercept= median(rem_no)), color = "orange", size = 2)+
-  scale_fill_manual(values=c("#EE7733","#117733"))
+  scale_fill_manual(values=c("#EE7733","#117733"))+
+  xlab("Count of scat removed") +
+  ylab("Frequency")
 
 ggplot(db_data, aes(x = rem_no, fill = env_type)) +
   geom_histogram() +
   facet_wrap(~env_type)+
-  scale_fill_manual(values=c("#EE7733","#117733"))
+  scale_fill_manual(values=c("#EE7733","#117733"))+
+  xlab("Count of scat removed") +
+  ylab("Frequency")
+
+#Without 0s
 
 ggplot(remno_adj, aes(x = rem_no, fill = env_type)) +
   geom_histogram()+
-  scale_fill_manual(values=c("#EE7733","#117733"))
-  # geom_vline(aes(xintercept= mean(rem_no)), color = "blue", size = 2) +
-  # geom_vline(aes(xintercept= median(rem_no)), color = "orange", size = 2) # Without 0s
+  scale_fill_manual(values=c("#EE7733","#117733"))+
+  xlab("Count of scat removed") +
+  ylab("Frequency") +
+  xlim(0,16)
 
 ggplot(remno_adj, aes(x = rem_no, fill = env_type)) +
   geom_histogram() +
   facet_wrap(~env_type)+
-  scale_fill_manual(values=c("#EE7733","#117733"))
+  scale_fill_manual(values=c("#EE7733","#117733"))+
+  xlab("Count of scat removed") +
+  ylab("Frequency")+
+  xlim(0,16)
 
 # Latency 
 
@@ -90,22 +104,30 @@ ggplot(db_data, aes(x = latency2, fill = env_type)) +
   geom_histogram() +
   geom_vline(aes(xintercept= mean(latency2)), color = "blue", size = 2) +
   geom_vline(aes(xintercept= median(latency2)), color = "orange", size = 2)+
-  scale_fill_manual(values=c("#EE7733","#117733"))
+  scale_fill_manual(values=c("#EE7733","#117733"))+
+  xlab("Time until first removal (hrs)") +
+  ylab("Frequency")
 
 ggplot(db_data, aes(x = latency2, fill = env_type)) +
   geom_histogram() +
   facet_wrap(~env_type)+
-  scale_fill_manual(values=c("#EE7733","#117733"))
+  scale_fill_manual(values=c("#EE7733","#117733"))+
+  xlab("Time until first removal (hrs)") +
+  ylab("Frequency")
 
 # Hour
 ggplot(db_data, aes( x=hour2, fill=env_type)) +
   geom_histogram()+
-  scale_fill_manual(values=c("#EE7733","#117733"))
+  scale_fill_manual(values=c("#EE7733","#117733"))+
+  xlab("Hour of first removal (24-hour clock)") +
+  ylab("Frequency")
 
 ggplot(db_data, aes(x = hour2, fill = env_type)) +
   geom_histogram() +
   facet_wrap(~env_type)+
-  scale_fill_manual(values=c("#EE7733","#117733"))
+  scale_fill_manual(values=c("#EE7733","#117733"))+
+  xlab("Hour of first removal (24-hour clock)") +
+  ylab("Frequency")
 
 ## --------------- SUMMARIES ----------------------------------------
 
@@ -117,6 +139,19 @@ sum_remno <- db_data %>%
             median=median(rem_no, na.rm = TRUE),
             sd=sd(rem_no, na.rm = TRUE))
 
+
+write.table(sum_remno, file = "dbenv_sum_remno", sep=",", quote = FALSE)
+
+sum_remno_noz <- remno_adj %>% 
+  group_by(env_type) %>% 
+  summarize(min=min(rem_no, na.rm=TRUE),
+            max=max(rem_no, na.rm=TRUE),
+            mean=mean(rem_no, na.rm=TRUE),
+            median=median(rem_no, na.rm = TRUE),
+            sd=sd(rem_no, na.rm = TRUE))
+
+write.table(sum_remno_noz, file = "dbenv_sum_nozerosremno", sep=",", quote = FALSE)
+
 sum_lat <- db_data %>% 
   group_by(env_type) %>% 
   summarize(min=min(latency2, na.rm=TRUE),
@@ -124,6 +159,8 @@ sum_lat <- db_data %>%
             mean=mean(latency2, na.rm=TRUE),
             median=median(latency2, na.rm=TRUE),
             sd=sd(latency2, na.rm=TRUE))
+
+write.table(sum_lat, file = "dbenv_sum_lat", sep=",", quote = FALSE)
 
 sum_hour <- db_data %>% 
   group_by(env_type) %>% 
@@ -133,7 +170,9 @@ sum_hour <- db_data %>%
             median=median(latency2, na.rm = TRUE),
             sd=sd(hour2, na.rm=TRUE))
 
-## --------------- FILTER OUTLIERS ----------------------------------------
+write.table(sum_hour, file = "dbenv_sum_hour", sep=",", quote = FALSE)
+
+## --------------- CHECK/FILTER OUTLIERS ----------------------------------------
 
 grubbs.test(db_data$rem_no)
  

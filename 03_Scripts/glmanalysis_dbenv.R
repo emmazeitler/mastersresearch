@@ -19,7 +19,7 @@ library(DHARMa)
 library(emmeans)
 library(MuMIn)
 
-read_csv("02_Clean_data/Dungbeetle_Env_clean.csv")
+db_data <- read_csv("02_Clean_data/dbenv_clean.csv")
 
 ## --------------- CHECK DATA STRUCTURE ----------------------------------------
 
