@@ -13,41 +13,17 @@
 ## --------------- SET—UP WORKSPACE --------------------------------------------
 
 library(tidyverse)
+library(dplyr)
 library(lubridate)
-library(glmmTMB)
-library(car)
-library(ggResidpanel)
-library(DHARMa)
-library(emmeans)
-library(MuMIn)
 library(outliers)
+library(ggplot2)
 
-db_data <- read.csv("02_Clean_data/dbenv_clean.csv")
+db_data <- read.csv("02_Clean_data/dbenv_use.csv")
 
 ## --------------- CHECK DATA STRUCTURE ----------------------------------------
+
 str(db_data)
 summary(db_data)
-
-# Turn experiment groupings into factors
-db_data$block_id <- as.factor(db_data$block_id)
-db_data$burn_season <- as.factor(db_data$burn_season)
-db_data$env_type <- as.factor(db_data$env_type)
-
-remno_adj <- db_data %>% 
-  select(date, block_id, burn_season, env_type, rem_no) %>% 
-  filter(rem_no > 0)
-
-## --------------- FILTER MISSING DATA ----------------------------------------
-
-# Filter NAs
-db_data$latency2 = gsub("NA", "", db_data$latency) %>% as.numeric()
-db_data$hour2 = gsub("NA", "", db_data$hour) %>% as.numeric()
-
-db_data <- head(db_data, - 1)
-
-remno_adj <- db_data %>% 
-  select(date, block_id, burn_season, env_type, rem_no) %>% 
-  filter(rem_no > 0)
 
 ## --------------- HISTOGRAMS ------------------------------------------------
 
