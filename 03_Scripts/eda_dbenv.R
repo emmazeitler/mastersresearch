@@ -1,6 +1,6 @@
 
 ## --------------- HEADER ------------------------------------------------------
-## Script eda_db_env.R
+## Script: eda_dbenv.R
 ## Author: Emma Zeitler, UF D.E.E.R. Lab
 ## Department: Wildlife Ecology and Conservation
 ## Affiliaton: University of Florida
