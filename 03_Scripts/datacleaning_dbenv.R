@@ -10,7 +10,6 @@
 
 ## --------------- SET—UP WORKSPACE --------------------------------------------
 library(tidyverse)
-library(dplyr)
 library(lubridate)
 
 db_data <- read_csv("02_Clean_data/dbenv_clean.csv")
@@ -22,11 +21,17 @@ summary(db_data)
 
 ## --------------- CHANGE DATA TYPES FOR ANALYSES ------------------------------
 
+db_data$burn_season[db_data$burn_season =="F"] <- "Fall"
+db_data$burn_season[db_data$burn_season =="SP"] <- "Spring"
+db_data$burn_season[db_data$burn_season =="SU"] <- "Summer"
+db_data$burn_season[db_data$burn_season =="W"] <- "Winter"
+
+## --------------- CHANGE DATA TYPES FOR ANALYSES ------------------------------
+
 # Turn experiment groupings into factors
 db_data$block_id <- as.factor(db_data$block_id)
 db_data$burn_season <- as.factor(db_data$burn_season)
 db_data$env_type <- as.factor(db_data$env_type)
-
 
 ## --------------- FILTER MISSING DATA ----------------------------------------
 

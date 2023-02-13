@@ -11,7 +11,6 @@
 
 ## --------------- SET—UP WORKSPACE --------------------------------------------
 library(tidyverse)
-library(dplyr)
 library(glmmTMB)
 library(car)
 library(ggResidpanel)
