@@ -1,0 +1,41 @@
+
+# Separate the treatments
+burn <- seeds %>% 
+	filter(BURN == 'Y') %>% 
+	select(-BURN)
+colnames(burn)[4] <- "BURN.RAW.SEEDS" # change the name of duplicate columns
+colnames(burn)[5] <- "BURN.ADJ.SEEDS"
+
+rough <- seeds %>% 
+	filter(BURN == 'N') %>% 
+	select(-BURN)
+colnames(rough)[4] <- "ROUGH.RAW.SEEDS"
+colnames(rough)[5] <- "ROUGH.ADJ.SEEDS"
+
+seeds <- merge(burn, rough) # recombine
+
+# Calculate the effect size
+seeds.es <- seeds %>%
+	mutate(DIFF.RAW.SEEDS = BURN.RAW.SEEDS-ROUGH.RAW.SEEDS,
+				 LN.RAW.SEEDS = log(BURN.RAW.SEEDS/ROUGH.RAW.SEEDS),
+				 DIFF.ADJ.SEEDS = BURN.ADJ.SEEDS-ROUGH.ADJ.SEEDS,
+				 LN.ADJ.SEEDS = log(BURN.ADJ.SEEDS/ROUGH.ADJ.SEEDS))
+
+# Here you can model and/or summarize the effect
+# check the distribution, run a model using pair and season
+# pull the mean and confidence intervals from emmeans
+# make a bar chart
+	- if you want to plot the raw data, you can add the original
+		effect size values with geom_point
+
+# This was my summarization for metafor (less useful to you now)
+seeds.es <- seeds.es %>%
+	group_by(SITE) %>%
+	summarize(DIFF.RAW.SEEDS.x = mean(DIFF.RAW.SEEDS),
+						DIFF.RAW.SEEDS.var = var(DIFF.RAW.SEEDS),
+						LN.RAW.SEEDS.x = mean(LN.RAW.SEEDS),
+						LN.RAW.SEEDS.var = var(LN.RAW.SEEDS),
+						DIFF.ADJ.SEEDS.x = mean(DIFF.ADJ.SEEDS),
+						DIFF.ADJ.SEEDS.var = var(DIFF.ADJ.SEEDS),
+						LN.ADJ.SEEDS.x = mean(LN.ADJ.SEEDS),
+						LN.ADJ.SEEDS.var = var(LN.ADJ.SEEDS))

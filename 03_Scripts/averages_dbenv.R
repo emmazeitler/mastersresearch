@@ -3,8 +3,7 @@ library(lubridate)
 
 db_data <- read_csv("02_Clean_data/dbenv_use.csv")
 db_data$date <- mdy(db_data$date)
-rm(list=setdiff(ls(), "db_data"))
-
+class(db_data$date)
 
 spring_avgs <- db_data %>% 
   filter(burn_season == "Spring") %>% 
@@ -46,6 +45,12 @@ ggplot(averages) +
   ylab("Amount of Dung Removed") +
   facet_wrap(~burn_season)
 
+ggplot(averages)+
+  geom_point(aes(x=burn_season, y=rem_no, color=burn_season, size=2))+
+  xlab("Burn Season")+
+  ylab("Amount of Scat Removed")+
+  facet_wrap(~env_type)
+
 ggplot(averages) +
   geom_point(aes(x=env_type, y=rem_event, color = env_type, size = 3)) +
   scale_color_manual(values=c("#d2601a", "#1d3c45"))+
@@ -53,12 +58,21 @@ ggplot(averages) +
   ylab("Probability of Removal") +
   facet_wrap(~burn_season)
 
+ggplot(averages)+
+  geom_point(aes(x=burn_season, y=rem_event, color=burn_season, size=2))+
+  xlab("Burn Season")+
+  ylab("Probability of Removal")+
+  facet_wrap(~env_type)
+
 ggplot(averages) +
   geom_point(aes(x=env_type, y=latency, color = env_type, size = 3)) +
   scale_color_manual(values=c("#d2601a", "#1d3c45"))+
   xlab("Environment Type") +
   ylab("Latency Until Removal") +
   facet_wrap(~burn_season)
-
   
-
+ggplot(averages)+
+  geom_point(aes(x=burn_season, y=latency, color=burn_season, size=2))+
+  xlab("Burn Season")+
+  ylab("Time Until First Removal")+
+  facet_wrap(~env_type)
