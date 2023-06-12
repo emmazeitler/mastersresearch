@@ -121,7 +121,7 @@ sum_remno <- db_data %>%
             sd=sd(rem_no, na.rm = TRUE))
 
 
-write.table(sum_remno, file = "dbenv_sum_remno.txt", sep=",", quote = FALSE)
+# write.table(sum_remno, file = "dbenv_sum_remno.txt", sep=",", quote = FALSE)
 
 sum_remno_noz <- remno_adj %>% 
   group_by(env_type) %>% 
@@ -131,7 +131,7 @@ sum_remno_noz <- remno_adj %>%
             median=median(rem_no, na.rm = TRUE),
             sd=sd(rem_no, na.rm = TRUE))
 
-write.table(sum_remno_noz, file = "dbenv_sum_nozerosremno.txt", sep=",", quote = FALSE)
+# write.table(sum_remno_noz, file = "dbenv_sum_nozerosremno.txt", sep=",", quote = FALSE)
 
 sum_lat <- db_data %>% 
   group_by(env_type) %>% 
@@ -141,7 +141,7 @@ sum_lat <- db_data %>%
             median=median(latency2, na.rm=TRUE),
             sd=sd(latency2, na.rm=TRUE))
 
-write.table(sum_lat, file = "dbenv_sum_lat.txt", sep=",", quote = FALSE)
+# write.table(sum_lat, file = "dbenv_sum_lat.txt", sep=",", quote = FALSE)
 
 sum_hour <- db_data %>% 
   group_by(env_type) %>% 
@@ -151,7 +151,7 @@ sum_hour <- db_data %>%
             median=median(latency2, na.rm = TRUE),
             sd=sd(hour2, na.rm=TRUE))
 
-write.table(sum_hour, file = "dbenv_sum_hour.txt", sep=",", quote = FALSE)
+# write.table(sum_hour, file = "dbenv_sum_hour.txt", sep=",", quote = FALSE)
 
 ## --------------- CHECK/FILTER OUTLIERS ----------------------------------------
 

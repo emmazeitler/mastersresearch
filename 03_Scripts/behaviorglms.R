@@ -25,23 +25,10 @@ emmeans(modRem1, ~env_type, type = "response")
 
 emmeans(modRem1, ~burn_season, type = "response") %>% as.data.frame()
 
-emmeans(modRem1, pairwise~env_type | burn_season , type = "response")
+remProb <- emmeans(modRem1, pairwise~env_type | burn_season , type = "response") %>% as.data.frame()
 
-# emmeans(modRem1, pairwise~burn_season + env_type, type = "response")
-
-# ggplot(em_remevent) +
-#   geom_point(aes(x=env_type, y=prob, color=env_type, size = 2))+
-#   facet_wrap(~burn_season)+
-#   theme_bw()
-# 
-# ggplot(em_remevent)+
-#   geom_point(aes(x=burn_season, y=prob, color=burn_season, size=2))+
-#   facet_wrap(~env_type)+
-#   ylab("Probability of Removal")+
-#   theme_bw()
-
+emmeans(modRem1, ~env_type | burn_season , type = "response")
 ## Amount of Dung Removed ##
-# modRemNo <- glmmTMB(data = db_data, rem_no ~ env_type * burn_season + (1|block_id), family= nbinom2)
 
  modRemNo <- glmmTMB(data = db_data, rem_no ~ env_type * burn_season + (1|block_id), family= nbinom2)
 
@@ -52,24 +39,9 @@ plot(resRemNo)
 Anova(modRemNo)
 summary(modRemNo)
 
-# emmeans(modRemNo, ~env_type, type = "response")
-
-# emmeans(modRemNo, pairwise~burn_season, type = "response")
-
 emmeans(modRemNo, pairwise~env_type | burn_season , type = "response")
 
 test <- emmeans(modRemNo, pairwise~env_type | burn_season , type = "response") %>% as.data.frame()
-
-# ggplot(em_remno) +
-#   geom_point(aes(x=env_type, y=response, color=env_type, size = 2))+
-#   facet_wrap(~burn_season)+
-#   theme_bw()
-# 
-# ggplot(em_remno)+
-#   geom_point(aes(x=burn_season, y=response, color=burn_season, size=2))+
-#   facet_wrap(~env_type)+
-#   ylab("Amount of Dung Removed")+
-#   theme_bw()
 
 ## Latency ##
 
@@ -83,17 +55,6 @@ Anova(modLat)
 summary(modLat)
 
 emmeans(modLat, ~env_type, type = "response")
-em_lat <- emmeans(modLat, ~burn_season + env_type, type = "response") %>% as.data.frame()
 
 emmeans(modLat, pairwise~env_type | burn_season, type = "response")
 
-# ggplot(em_lat) +
-#   geom_point(aes(x=env_type, y=emmean, color=env_type, size = 2))+
-#   facet_wrap(~burn_season)+
-#   theme_bw()
-# 
-# ggplot(em_lat)+
-#   geom_point(aes(x=burn_season, y=emmean, color=burn_season, size=2))+
-#   facet_wrap(~env_type)+
-#   ylab("Hours Until First Removal")+
-#   theme_bw()
