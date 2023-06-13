@@ -1,4 +1,13 @@
+library(tidyverse)
+library(glmmTMB)
+library(car)
+library(ggResidpanel)
+library(DHARMa)
+library(emmeans)
+library(MuMIn)
+
 #### RemNo ####
+remno_lr <- read_csv("02_Clean_data/remNo_lr_raw.csv")
 
 mod.remno.lr <- glmmTMB(data = remno_lr, ln.ratio ~ burn.season + (1|id), family=gaussian)
 
@@ -9,20 +18,16 @@ plot(res.remno.lr)
 Anova(mod.remno.lr)
 summary(mod.remno.lr)
 
-emmeans(mod.remno.lr, ~burn.season)
+remNo_lrmod <- emmeans(mod.remno.lr, ~burn.season) %>% as.data.frame()
 
-emmeans(mod.remno.lr, pairwise~burn.season, adjust = "none")
-
-## Summer - Winter 0.04 
-
-em.remno.lr <- emmeans(mod.remno.lr, ~burn.season) %>% as.data.frame()
+write_csv(remNo_lrmod, "02_Clean_data/remNo_lrmod.csv")
 
 #### Probability of Removal ####
 
 
 #### Latency ####
 
-hist(remlat_lr$ln.ratio)
+remlat_lr <- read_csv("02_Clean_data/remLat_lr_raw.csv")
 
 mod.remlat.lr <- glmmTMB(data = remlat_lr, ln.ratio ~ burn.season + (1|id), family=gaussian)
 
@@ -33,6 +38,5 @@ plot(res.remlat.lr)
 Anova(mod.remlat.lr)
 summary(mod.remlat.lr)
 
-emmeans(mod.remlat.lr, ~burn.season)
-
-emmeans(mod.remlat.lr, pairwise~burn.season, adjust = "none")
+remlat_lrmod <- emmeans(mod.remlat.lr, ~burn.season) %>% as.data.frame()
+# write_csv(remlat_lrmod, "02_Clean_data/remlat_lrmod.csv")

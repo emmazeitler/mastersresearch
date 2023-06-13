@@ -9,6 +9,8 @@ library(effsize)
 
 db_data <- read_csv("02_Clean_data/dbenv_use.csv")
 
+#### Log Ratio ####
+
 #### Removal Number ####
 
 # Separate the treatments
@@ -45,31 +47,9 @@ remno_lr <- remno %>%
 colnames(remno_lr)[2] <- "burn.season"
 table(remno$burn_season.x)
 
-# write_csv(remno_lr, "02_Clean_data/lr_remNo.csv")
+# write_csv(remno_lr, "02_Clean_data/remNo_lr_raw.csv")
 
 hist(remno_lr$ln.ratio)
-
-#### Probability of Removal ####
-
-remev_b <- db_data %>% 
-  filter(env_type == "BURN") %>% 
-  select(burn_season, env_type, rem_event) %>% 
-  select(-env_type)
-
-colnames(remev_b)[2] <- "burn"
-remev_b$id <- seq.int(nrow(remev_b))
-
-remev_s <- db_data %>% 
-  filter(env_type == "SCRUB") %>% 
-  select(burn_season, env_type, rem_event) %>% 
-  select(-env_type)
-
-colnames(remev_s)[2] <- "scrub"
-remev_s$id <- seq.int(nrow(remev_s))
-
-remev <- remev_b %>% 
-  merge(remev_s, by="id") %>%
-  select(-burn_season.y)
 
 #### Latency ####
 
@@ -94,6 +74,7 @@ remlat <- remlat_b %>%
   select(-burn_season.y)
 
 ## Log ratio effect size ##
+
 remlat_lr <- remlat %>% 
   mutate(diff = burn-scrub,
          ln.ratio = log(burn/scrub)) %>% 
@@ -101,7 +82,7 @@ remlat_lr <- remlat %>%
 
 colnames(remlat_lr)[2] <- "burn.season"
 
-# write_csv(remno_lr, "02_Clean_data/lr_remNo.csv")
+# write_csv(remlat_lr, "02_Clean_data/remLat_lr_raw.csv")
 
 #### Cohen's d ####
 
@@ -276,12 +257,7 @@ library(pwr)
 
 rm(list=setdiff(ls(), "db_data"))
 
-spring_avgs <- db_data %>% 
-  filter(burn_season == "Spring") %>% 
-  group_by(burn_season, env_type) %>% 
-  summarize(rem_no = mean(rem_no, na.rm=TRUE),
-            rem_event = mean(rem_event, na.rm=TRUE),
-            latency = mean(latency2, na.rm=TRUE))
+# Spring
 
 sp <- db_data %>% 
   filter(burn_season == "Spring") %>% 
@@ -289,9 +265,6 @@ sp <- db_data %>%
   summarize(sum = sum(rem_event, na.rm=TRUE),
             total = n()) %>% 
   mutate(prop = sum/total)
-
-test <- sp %>% 
-  pivot_wider(names_from = env_type, values_from = prop)
 
 sp_prop_b <- sp %>% 
   filter(env_type == "BURN") %>% 
@@ -309,8 +282,98 @@ colnames(sp_prop_S)[2] <- "scrub"
 
 sp.prop <- merge(sp_prop_b, sp_prop_S, by="burn_season")
 
-
 sp.prop.es <- sp.prop %>% 
-  mutate(lo.ratio = burn/(1 - burn)/(scrub / (1 - scrub)))
+  mutate(cohen.h = ES.h(sp.prop$burn, sp.prop$scrub))
 
+# Summer
 
+su <- db_data %>% 
+  filter(burn_season == "Summer") %>% 
+  group_by(burn_season, env_type) %>%
+  summarize(sum = sum(rem_event, na.rm=TRUE),
+            total = n()) %>% 
+  mutate(prop = sum/total)
+
+su_prop_b <- su %>% 
+  filter(env_type == "BURN") %>% 
+  select(burn_season, env_type, prop) %>% 
+  select(-env_type)
+
+colnames(su_prop_b)[2] <- "burn"
+
+su_prop_S <- su %>% 
+  filter(env_type == "SCRUB") %>% 
+  select(burn_season, env_type, prop) %>% 
+  select(-env_type)
+
+colnames(su_prop_S)[2] <- "scrub"
+
+su.prop <- merge(su_prop_b, su_prop_S, by="burn_season")
+
+su.prop.es <- su.prop %>% 
+  mutate(cohen.h = ES.h(su.prop$burn, su.prop$scrub))
+
+# Fall
+
+fa <- db_data %>% 
+  filter(burn_season == "Fall") %>% 
+  group_by(burn_season, env_type) %>%
+  summarize(sum = sum(rem_event, na.rm=TRUE),
+            total = n()) %>% 
+  mutate(prop = sum/total)
+
+fa_prop_b <- fa %>% 
+  filter(env_type == "BURN") %>% 
+  select(burn_season, env_type, prop) %>% 
+  select(-env_type)
+
+colnames(fa_prop_b)[2] <- "burn"
+
+fa_prop_S <- fa %>% 
+  filter(env_type == "SCRUB") %>% 
+  select(burn_season, env_type, prop) %>% 
+  select(-env_type)
+
+colnames(fa_prop_S)[2] <- "scrub"
+
+fa.prop <- merge(fa_prop_b, fa_prop_S, by="burn_season")
+
+fa.prop.es <- fa.prop %>% 
+  mutate(cohen.h = ES.h(fa.prop$burn, fa.prop$scrub))
+
+# Winter
+
+wi <- db_data %>% 
+  filter(burn_season == "Winter") %>% 
+  group_by(burn_season, env_type) %>%
+  summarize(sum = sum(rem_event, na.rm=TRUE),
+            total = n()) %>% 
+  mutate(prop = sum/total)
+
+wi_prop_b <- wi %>% 
+  filter(env_type == "BURN") %>% 
+  select(burn_season, env_type, prop) %>% 
+  select(-env_type)
+
+colnames(wi_prop_b)[2] <- "burn"
+
+wi_prop_S <- wi %>% 
+  filter(env_type == "SCRUB") %>% 
+  select(burn_season, env_type, prop) %>% 
+  select(-env_type)
+
+colnames(wi_prop_S)[2] <- "scrub"
+
+wi.prop <- merge(wi_prop_b, wi_prop_S, by="burn_season")
+
+wi.prop.es <- wi.prop %>% 
+  mutate(cohen.h = ES.h(wi.prop$burn, wi.prop$scrub))
+
+propRem_ch <- rbind(sp.prop.es, su.prop.es)
+propRem_ch <- rbind(propRem_ch, fa.prop.es)
+propRem_ch <- rbind(propRem_ch, wi.prop.es)
+
+propRem_ch <- propRem_ch %>% 
+  pivot_longer(cols = 2:3, names_to = "env_type", values_to = "remProb")
+
+# write_csv(propRem_ch, "02_Clean_data/propRem_ch.csv")
