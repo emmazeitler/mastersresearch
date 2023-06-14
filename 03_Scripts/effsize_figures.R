@@ -76,6 +76,8 @@ remno.lr <- read_csv("02_Clean_data/remNo_lrmod.csv")
 ggplot() +
   geom_col(data=remno.lr,
            aes(x=factor(burn.season, level=c("Spring", "Summer", "Fall", "Winter")), y=emmean, fill=burn.season))+
+  geom_hline(yintercept = 0,
+             linetype = "dashed")+
   geom_errorbar(data=remno.lr, 
                 aes(x=burn.season, 
                     y=emmean, 
@@ -110,21 +112,20 @@ ggplot() +
 noRem_cd <- read_csv("02_Clean_data/remno_cd.csv")
 
 ggplot(data=noRem_cd)+
-  geom_point(aes(x=factor(burn_season, 
+  geom_col(aes(x=factor(burn_season, 
                           level=c("Spring", "Summer", "Fall", "Winter")),
                  y=Estimate,
-                 color=burn_season),
-             size=4)+
+                 fill=burn_season))+
   geom_hline(yintercept = 0,
              linetype = "dashed")+
   geom_errorbar(data=noRem_cd, 
                 aes(x=burn_season, 
                     y=Estimate, 
                     ymin=lcl,
-                    ymax=ucl,
-                    color=burn_season),
+                    ymax=ucl),
+                color="black",
                 width=0.2)+
-  scale_color_manual(values=firecolors1)+
+  scale_fill_manual(values=firecolors1)+
   labs(x="Season of fire",
        y="Effect size (Cohen's d)",
        title = "Amount of dung removed")+
@@ -145,7 +146,7 @@ ggplot(data=noRem_cd)+
         legend.position="none",
         legend.title = element_text(size = 19))
 
-# ggsave("05_Figures/effsize_remNo_cd.jpg", height=10, width= 10)  
+ggsave("05_Figures/effsize_remNo_cd.jpg", height=10, width= 10)
 
 #### Latency - Log ratio ####
 remlat.lr <- read_csv("02_Clean_data/remlat_lrmod.csv")
@@ -190,20 +191,19 @@ ggplot() +
 lat_cd <- read_csv("02_Clean_data/lat_cd.csv")
 
 ggplot(data=lat_cd)+
-  geom_point(aes(x=factor(burn_season,
+  geom_col(aes(x=factor(burn_season,
                            levels=c("Summer", "Fall", "Winter")),
                  y=Estimate,
-                 color=burn_season),
-             size=5)+
+                 fill=burn_season))+
   geom_hline(yintercept = 0,
              linetype = "dashed")+
   geom_errorbar(aes(x=burn_season, 
                     y=Estimate, 
                     ymin=lcl,
-                    ymax=ucl,
-                    color=burn_season),
+                    ymax=ucl),
+                color="black",
                 width=0.2)+
-  scale_color_manual(values=firecolors1)+
+  scale_fill_manual(values=firecolors1)+
   labs(x="Season of fire",
        y="Effect size (Cohen's d)",
        title = "Time until dung removal")+

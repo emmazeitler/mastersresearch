@@ -54,6 +54,8 @@ ggplot(data=remProb)+
         legend.position="none",
         legend.title = element_text(size = 19))
 
+ggsave("05_Figures/remProb.jpg", height = 10, width = 10)
+
 #### Amount of dung removed ####
 
 nozeros <- db_data %>% 
@@ -103,6 +105,8 @@ ggplot(data = remNo)+
         legend.position="none",
         legend.title = element_text(size = 19))
 
+ggsave("05_Figures/remNo.jpg", height=10, width=10)
+
 #### Latency ####
 
 modLat <- glmmTMB(data = db_data, latency2 ~ env_type * burn_season + (1|block_id), family = gaussian)
@@ -147,5 +151,5 @@ ggplot(data = Lat)+
         legend.text = element_text(size = 18),
         legend.position="none",
         legend.title = element_text(size = 19))
-
+ggsave("05_Figures/remLat.jpg", height=10, width=10)
              
