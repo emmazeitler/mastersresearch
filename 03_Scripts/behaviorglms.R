@@ -8,9 +8,16 @@ library(MuMIn)
 
 db_data <- read_csv("02_Clean_data/dbenv_use.csv")
 
+db_data <- db_data %>% 
+  filter(!burn_season == "Spring")
+
+rem1 <- db_data %>% 
+  filter(rem_no > 0)
+
+
 ## Removal Event ##
 
-modRem1 <- glmmTMB(data = db_data, rem_event ~ env_type * burn_season + (1|block_id), family=binomial)
+modRem1 <- glmmTMB(data = db_data, rem_event ~ env_type * burn_season + (1|block_id) + (1|pair_id), family=binomial)
 
 resRem1 <- simulateResiduals(fittedModel = modRem1, n = 250)
 hist(resRem1)
@@ -30,7 +37,9 @@ remOddsRatio <- remProb$contrasts %>% as.data.frame()
 
 ## Amount of Dung Removed ##
 
- modRemNo <- glmmTMB(data = db_data, rem_no ~ env_type * burn_season + (1|block_id), family= nbinom2)
+modRemNo <- glmmTMB(data = rem1, rem_no ~ env_type * burn_season + (1|block_id) +(1|pair_id), family= nbinom2)
+ 
+ modRemNo <- glmmTMB(data = db_data, rem_no ~ env_type * burn_season + (1|block_id) +(1|pair_id), family= nbinom2)
 
 resRemNo <- simulateResiduals(fittedModel = modRemNo, n =250)
 hist(resRemNo)

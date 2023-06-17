@@ -8,8 +8,12 @@ library(MuMIn)
 
 #### RemNo ####
 remno_lr <- read_csv("02_Clean_data/remNo_lr_raw.csv")
+remno_lr <- remno_lr %>% 
+  filter(!burn.season == "Spring")
 
-mod.remno.lr <- glmmTMB(data = remno_lr, ln.ratio ~ burn.season + (1|id), family=gaussian)
+mod.remno.lr <- glmmTMB(data = remno_lr, ln.ratio ~ burn.season + (1|pair_id) + (1|block_id), family=gaussian)
+
+summary(test)
 
 res.remno.lr <- simulateResiduals(fittedModel = mod.remno.lr, n = 250)
 hist(res.remno.lr)
@@ -20,7 +24,7 @@ summary(mod.remno.lr)
 
 remNo_lrmod <- emmeans(mod.remno.lr, ~burn.season) %>% as.data.frame()
 
-write_csv(remNo_lrmod, "02_Clean_data/remNo_lrmod.csv")
+# write_csv(remNo_lrmod, "02_Clean_data/remNo_lrmod.csv")
 
 #### Probability of Removal ####
 
@@ -28,8 +32,10 @@ write_csv(remNo_lrmod, "02_Clean_data/remNo_lrmod.csv")
 #### Latency ####
 
 remlat_lr <- read_csv("02_Clean_data/remLat_lr_raw.csv")
+remlat_lr <- remlat_lr %>% 
+  filter(!burn.season == "Spring")
 
-mod.remlat.lr <- glmmTMB(data = remlat_lr, ln.ratio ~ burn.season + (1|id), family=gaussian)
+mod.remlat.lr <- glmmTMB(data = remlat_lr, ln.ratio ~ burn.season + (1|pair_id) + (1|block_id), family=gaussian)
 
 res.remlat.lr <- simulateResiduals(fittedModel = mod.remlat.lr, n = 250)
 hist(res.remlat.lr)

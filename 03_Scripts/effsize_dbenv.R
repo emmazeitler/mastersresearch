@@ -9,31 +9,64 @@ library(effsize)
 
 db_data <- read_csv("02_Clean_data/dbenv_use.csv")
 
+db_data2 <- db_data %>% 
+  select(pair_id, block_id, burn_season, env_type, rem_no, rem_event)
+
+burn <- db_data2 %>% 
+  filter(env_type == "BURN") %>% 
+  rename(burn_env = env_type,
+         rem_no_b = rem_no,
+         rem_event_b = rem_event)
+
+burn$id <- seq.int(nrow(burn))
+  
+scrub <- db_data2 %>% 
+  filter(env_type == "SCRUB") %>% 
+  rename(scrub_env = env_type,
+         rem_no_s = rem_no,
+         rem_event_s = rem_event) %>% 
+  select(pair_id, scrub_env, rem_no_s, rem_event_s)
+
+scrub$id <- seq.int(nrow(scrub))
+
+# x <- merge(burn, scrub, by="id")
+# remove <- x %>% 
+#   unite("filt", c('rem_event_b', 'rem_event_s'), sep="",) %>% 
+#   select(id, filt)
+# 
+# seq_pattern <- seq(1, length.out = nrow(db_data2)/2)
+# repeated_seq <- rep(seq_pattern, each = 2)
+# db_data2$id <- repeated_seq
+
+db_data2 <- merge(burn, scrub, by = "pair_id")
+
 #### Log Ratio ####
 
 #### Removal Number ####
 
 # Separate the treatments
 
-remno_b <- db_data %>% 
+remno_b <- db_data2 %>% 
   filter(env_type == "BURN") %>% 
-  select(burn_season, env_type, rem_no) %>% 
+  select(block_id, pair_id, burn_season, env_type, rem_no) %>% 
   select(-env_type)
 
-colnames(remno_b)[2] <- "burn"
+colnames(remno_b)[4] <- "burn"
 remno_b$id <- seq.int(nrow(remno_b))
 
-remno_s <- db_data %>% 
+remno_s <- db_data2 %>% 
   filter(env_type == "SCRUB") %>% 
-  select(burn_season, env_type, rem_no) %>% 
+  select(pair_id, burn_season, env_type, rem_no) %>% 
   select(-env_type)
 
-colnames(remno_s)[2] <- "scrub"
+colnames(remno_s)[3] <- "scrub"
 remno_s$id <- seq.int(nrow(remno_s))
 
+names(remno)
+
 remno <- remno_b %>% 
-  merge(remno_s, by="id") %>%
-  select(-burn_season.y) 
+  merge(remno_s, by="pair_id") %>%
+  select(-burn_season.y, -id.x, -id.y) 
 
 #Log ratio effect size
 
@@ -44,10 +77,10 @@ remno_lr <- remno %>%
          ln.ratio = log(burn/scrub)) %>% 
   drop_na()
 
-colnames(remno_lr)[2] <- "burn.season"
-table(remno$burn_season.x)
+colnames(remno_lr)[3] <- "burn.season"
+table(remno$burn_season)
 
-# write_csv(remno_lr, "02_Clean_data/remNo_lr_raw.csv")
+write_csv(remno_lr, "02_Clean_data/remNo_lr_raw.csv")
 
 hist(remno_lr$ln.ratio)
 
@@ -55,23 +88,25 @@ hist(remno_lr$ln.ratio)
 
 remlat_b <- db_data %>% 
   filter(env_type == "BURN") %>% 
-  select(burn_season, env_type, latency2) %>% 
+  select(block_id, pair_id, burn_season, env_type, latency2) %>% 
   select(-env_type)
 
-colnames(remlat_b)[2] <- "burn"
+colnames(remlat_b)[4] <- "burn"
 remlat_b$id <- seq.int(nrow(remlat_b))
 
 remlat_s <- db_data %>% 
   filter(env_type == "SCRUB") %>% 
-  select(burn_season, env_type, latency2) %>% 
+  select(pair_id, burn_season, env_type, latency2) %>% 
   select(-env_type)
 
-colnames(remlat_s)[2] <- "scrub"
+colnames(remlat_s)[3] <- "scrub"
 remlat_s$id <- seq.int(nrow(remlat_s))
 
+names(remlat)
+
 remlat <- remlat_b %>% 
-  merge(remlat_s, by="id") %>%
-  select(-burn_season.y)
+  merge(remlat_s, by="pair_id") %>%
+  select(-burn_season.y, -id.x, -id.y)
 
 ## Log ratio effect size ##
 
@@ -80,7 +115,7 @@ remlat_lr <- remlat %>%
          ln.ratio = log(burn/scrub)) %>% 
   drop_na()
 
-colnames(remlat_lr)[2] <- "burn.season"
+colnames(remlat_lr)[3] <- "burn.season"
 
 # write_csv(remlat_lr, "02_Clean_data/remLat_lr_raw.csv")
 

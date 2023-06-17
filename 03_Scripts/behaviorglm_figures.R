@@ -8,9 +8,15 @@ library(MuMIn)
 
 db_data <- read_csv("02_Clean_data/dbenv_use.csv")
 
+db_data <- db_data %>% 
+  filter(!burn_season == "Spring")
+
+rem1 <- db_data %>% 
+  filter(rem_no > 0)
+
 #### Probability of removal ####
 
-modRem1 <- glmmTMB(data = db_data, rem_event ~ env_type * burn_season + (1|block_id), family=binomial)
+modRem1 <- glmmTMB(data = db_data, rem_event ~ env_type * burn_season + (1|block_id) + (1|pair_id), family=binomial)
 
 remProb <- emmeans(modRem1, ~env_type | burn_season , type = "response") %>% as.data.frame()
 
@@ -31,8 +37,7 @@ ggplot(data=remProb)+
   labs(x="Environment type",
        y="Probability of removal")+
   facet_wrap(~factor(burn_season,
-                     levels=c("Spring",
-                              "Summer",
+                     levels=c("Summer",
                               "Fall",
                               "Winter")))+
   theme_bw()+
@@ -61,7 +66,7 @@ ggsave("05_Figures/remProb.jpg", height = 10, width = 10)
 nozeros <- db_data %>% 
   filter(rem_no > 0)
 
-modRemNo <- glmmTMB(data = nozeros, rem_no ~ env_type * burn_season + (1|block_id), family= gaussian)
+modRemNo <- glmmTMB(data = nozeros, rem_no ~ env_type * burn_season + (1|block_id) + (1|pair_id), family= gaussian)
 
 remNo <- emmeans(modRemNo, ~env_type | burn_season , type = "response") %>% as.data.frame()
 
@@ -113,6 +118,8 @@ modLat <- glmmTMB(data = db_data, latency2 ~ env_type * burn_season + (1|block_i
 
 Lat <- emmeans(modLat, ~env_type | burn_season, type = "response") %>% 
   as.data.frame()
+
+emmeans(modLat, pairwise~env_type | burn_season, type = "response")
 
 ggplot(data = Lat)+
   geom_point(aes(x = env_type, 

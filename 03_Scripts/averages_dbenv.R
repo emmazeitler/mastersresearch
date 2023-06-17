@@ -2,8 +2,6 @@ library(tidyverse)
 library(lubridate)
 
 db_data <- read_csv("02_Clean_data/dbenv_use.csv")
-db_data$date <- mdy(db_data$date)
-class(db_data$date)
 
 spring_avgs <- db_data %>% 
   filter(burn_season == "Spring") %>% 

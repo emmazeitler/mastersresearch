@@ -1,3 +1,5 @@
+#### SET UP WORKSPACE ####
+
 library(tidyverse)
 library(ggplot2)
 
@@ -106,7 +108,7 @@ ggplot() +
         legend.position="none",
         legend.title = element_text(size = 19))
 
-# ggsave("05_Figures/effsize_remNo_lr.jpg", height=10, width= 10)
+ggsave("05_Figures/effsize_remNo_lr.jpg", height=10, width= 10)
 
 #### Amount of dung removed - Cohen's d ####
 noRem_cd <- read_csv("02_Clean_data/remno_cd.csv")
@@ -184,7 +186,7 @@ ggplot() +
         legend.position="none",
         legend.title = element_text(size = 19))
 
-# ggsave("05_Figures/effsize_remLat_lr.jpg", height=10, width= 10)
+ggsave("05_Figures/effsize_remLat_lr.jpg", height=10, width= 10)
 
 #### Latency - Cohen's d ####
 

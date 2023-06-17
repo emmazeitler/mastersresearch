@@ -12,12 +12,37 @@
 library(tidyverse)
 library(lubridate)
 
-db_data <- read_csv("02_Clean_data/dbenv_clean.csv")
+db_data <- read_csv("01_Raw_data/DB_Fire_raw.csv")
 
 ## --------------- CHECK DATA STRUCTURE ----------------------------------------
 
 str(db_data)
 summary(db_data)
+
+
+## --------------- SELECT VARIABLES THAT ARE RELEVANT ----------------------------
+names(db_data)
+
+db_data <- db_data %>% 
+  select(-Notes, 
+         -'Removal type', 
+         -'Weather conditions', 
+         -'Test Duration (h)', 
+         -'Start Time',
+         -'Time')
+
+## --------------- RENAME COLUMNS ----------------------------------------
+
+db_data <- db_data %>% 
+  rename(date = 'Date',
+         block_id = `Block ID`,
+         burn_season = `Burn Treatment`,
+         pair_id = `Pair ID`,
+         env_type = `Burn/Scrub`,
+         rem_no = `Number of pellets taken`,
+         rem_event = Removal,
+         latency = `Time until first removal (h)`,
+         hour = `Time at first removal`)
 
 ## --------------- CHANGE DATA TYPES FOR ANALYSES ------------------------------
 
@@ -32,6 +57,7 @@ db_data$burn_season[db_data$burn_season =="W"] <- "Winter"
 db_data$block_id <- as.factor(db_data$block_id)
 db_data$burn_season <- as.factor(db_data$burn_season)
 db_data$env_type <- as.factor(db_data$env_type)
+db_data$pair_id <- as.factor(db_data$ pair_id)
 
 ## --------------- FILTER MISSING DATA ----------------------------------------
 
@@ -43,6 +69,12 @@ db_data$hour2 = gsub("NA", "", db_data$hour) %>% as.numeric()
 
 db_data$date <- mdy(db_data$date)
 
-write.csv(db_data, file = "dbenv_use.csv")
+## --------------- DELETE UNPAIRED -----------------------------------------------
+
+db_data <- db_data %>% 
+  drop_na(pair_id)
+
+## --------------- SAVE CSV -----------------------------------------------
+write.csv(db_data, file = "02_Clean_data/dbenv_use.csv")
 
 
