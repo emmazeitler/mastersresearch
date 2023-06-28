@@ -10,6 +10,7 @@ library(effsize)
 db_data <- read_csv("02_Clean_data/dbenv_use.csv")
 
 db_data2 <- db_data %>% 
+  filter(norempair == 0) %>% 
   select(pair_id, block_id, burn_season, env_type, rem_no, rem_event)
 
 burn <- db_data2 %>% 
@@ -29,15 +30,6 @@ scrub <- db_data2 %>%
 
 scrub$id <- seq.int(nrow(scrub))
 
-# x <- merge(burn, scrub, by="id")
-# remove <- x %>% 
-#   unite("filt", c('rem_event_b', 'rem_event_s'), sep="",) %>% 
-#   select(id, filt)
-# 
-# seq_pattern <- seq(1, length.out = nrow(db_data2)/2)
-# repeated_seq <- rep(seq_pattern, each = 2)
-# db_data2$id <- repeated_seq
-
 db_data2 <- merge(burn, scrub, by = "pair_id")
 
 #### Log Ratio ####
@@ -47,17 +39,17 @@ db_data2 <- merge(burn, scrub, by = "pair_id")
 # Separate the treatments
 
 remno_b <- db_data2 %>% 
-  filter(env_type == "BURN") %>% 
-  select(block_id, pair_id, burn_season, env_type, rem_no) %>% 
-  select(-env_type)
+  filter(burn_env == "BURN") %>% 
+  select(block_id, pair_id, burn_season, burn_env, rem_no_b) %>% 
+  select(-burn_env)
 
 colnames(remno_b)[4] <- "burn"
 remno_b$id <- seq.int(nrow(remno_b))
 
 remno_s <- db_data2 %>% 
-  filter(env_type == "SCRUB") %>% 
-  select(pair_id, burn_season, env_type, rem_no) %>% 
-  select(-env_type)
+  filter(scrub_env == "SCRUB") %>% 
+  select(pair_id, burn_season, scrub_env, rem_no_s) %>% 
+  select(-scrub_env)
 
 colnames(remno_s)[3] <- "scrub"
 remno_s$id <- seq.int(nrow(remno_s))
@@ -86,17 +78,25 @@ hist(remno_lr$ln.ratio)
 
 #### Latency ####
 
-remlat_b <- db_data %>% 
+rm(list=setdiff(ls(), "db_data"))
+
+db_data <- read_csv("02_Clean_data/dbenv_use.csv")
+
+db_data2 <- db_data %>% 
+  filter(norempair == 0) %>% 
+  select(pair_id, block_id, burn_season, env_type, latency, rem_event)
+
+remlat_b <- db_data2 %>% 
   filter(env_type == "BURN") %>% 
-  select(block_id, pair_id, burn_season, env_type, latency2) %>% 
+  select(block_id, pair_id, burn_season, env_type, latency) %>% 
   select(-env_type)
 
 colnames(remlat_b)[4] <- "burn"
 remlat_b$id <- seq.int(nrow(remlat_b))
 
-remlat_s <- db_data %>% 
+remlat_s <- db_data2 %>% 
   filter(env_type == "SCRUB") %>% 
-  select(pair_id, burn_season, env_type, latency2) %>% 
+  select(pair_id, burn_season, env_type, latency) %>% 
   select(-env_type)
 
 colnames(remlat_s)[3] <- "scrub"
@@ -117,7 +117,7 @@ remlat_lr <- remlat %>%
 
 colnames(remlat_lr)[3] <- "burn.season"
 
-# write_csv(remlat_lr, "02_Clean_data/remLat_lr_raw.csv")
+write_csv(remlat_lr, "02_Clean_data/remLat_lr_raw.csv")
 
 #### Cohen's d ####
 
@@ -207,22 +207,26 @@ remno_cd <- rbind(remno_cd, wi.remno)
 
 rm(list=setdiff(ls(), "db_data"))
 
+db_data3 <- db_data %>% 
+  filter(norempair == 0) %>% 
+  select(pair_id, block_id, burn_season, env_type, latency, rem_event)
+
 #### Removal Number ####
 
 # Separate the treatments
 
-lat_b <- db_data %>% 
+lat_b <- db_data3 %>% 
   filter(env_type == "BURN") %>% 
-  select(burn_season, env_type, latency2) %>% 
+  select(burn_season, env_type, latency) %>% 
   select(-env_type) %>% 
   drop_na()
 
 colnames(lat_b)[2] <- "burn"
 lat_b$id <- seq.int(nrow(lat_b))
 
-lat_s <- db_data %>% 
+lat_s <- db_data3 %>% 
   filter(env_type == "SCRUB") %>% 
-  select(burn_season, env_type, latency2) %>% 
+  select(burn_season, env_type, latency) %>% 
   select(-env_type) %>% 
   drop_na()
 
@@ -283,7 +287,7 @@ wi.lat <- data_frame("burn_season" = "Winter",
 lat_cd <- rbind(su.lat, fa.lat)
 lat_cd <- rbind(lat_cd, wi.lat)
 
-write_csv(lat_cd, "02_Clean_data/lat_cd.csv")
+# write_csv(lat_cd, "02_Clean_data/lat_cd.csv")
 
 #### Cohen's h ####
 

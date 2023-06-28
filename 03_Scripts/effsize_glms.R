@@ -13,18 +13,20 @@ remno_lr <- remno_lr %>%
 
 mod.remno.lr <- glmmTMB(data = remno_lr, ln.ratio ~ burn.season + (1|pair_id) + (1|block_id), family=gaussian)
 
-summary(test)
-
 res.remno.lr <- simulateResiduals(fittedModel = mod.remno.lr, n = 250)
 hist(res.remno.lr)
 plot(res.remno.lr)
 
+testCategorical(res.remno.lr, remno_lr$burn.season)
+
 Anova(mod.remno.lr)
 summary(mod.remno.lr)
 
+emmeans(mod.remno.lr, pairwise~burn.season)
+
 remNo_lrmod <- emmeans(mod.remno.lr, ~burn.season) %>% as.data.frame()
 
-# write_csv(remNo_lrmod, "02_Clean_data/remNo_lrmod.csv")
+write_csv(remNo_lrmod, "02_Clean_data/remNo_lrmod.csv")
 
 #### Probability of Removal ####
 

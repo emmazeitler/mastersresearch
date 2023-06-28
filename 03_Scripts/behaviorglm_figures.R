@@ -11,8 +11,8 @@ db_data <- read_csv("02_Clean_data/dbenv_use.csv")
 db_data <- db_data %>% 
   filter(!burn_season == "Spring")
 
-rem1 <- db_data %>% 
-  filter(rem_no > 0)
+db_data_2 <- db_data %>% 
+  filter(norempair == 0)
 
 #### Probability of removal ####
 
@@ -63,10 +63,7 @@ ggsave("05_Figures/remProb.jpg", height = 10, width = 10)
 
 #### Amount of dung removed ####
 
-nozeros <- db_data %>% 
-  filter(rem_no > 0)
-
-modRemNo <- glmmTMB(data = nozeros, rem_no ~ env_type * burn_season + (1|block_id) + (1|pair_id), family= gaussian)
+modRemNo <- glmmTMB(data = db_data_2, rem_no ~ env_type * burn_season + (1|block_id) + (1|pair_id), family= gaussian)
 
 remNo <- emmeans(modRemNo, ~env_type | burn_season , type = "response") %>% as.data.frame()
 
@@ -114,7 +111,7 @@ ggsave("05_Figures/remNo.jpg", height=10, width=10)
 
 #### Latency ####
 
-modLat <- glmmTMB(data = db_data, latency2 ~ env_type * burn_season + (1|block_id), family = gaussian)
+modLat <- glmmTMB(data = db_data_2, latency ~ env_type * burn_season + (1|block_id), family = gaussian)
 
 Lat <- emmeans(modLat, ~env_type | burn_season, type = "response") %>% 
   as.data.frame()

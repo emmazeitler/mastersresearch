@@ -59,12 +59,17 @@ db_data$burn_season <- as.factor(db_data$burn_season)
 db_data$env_type <- as.factor(db_data$env_type)
 db_data$pair_id <- as.factor(db_data$ pair_id)
 
-## --------------- FILTER MISSING DATA ----------------------------------------
+## --------------- CORRECT LATENCY & REMOVAL NUMBER ----------------------------------------
 
-# Filter NAs
-db_data$latency2 = gsub("NA", "", db_data$latency) %>% as.numeric()
-db_data$hour2 = gsub("NA", "", db_data$hour) %>% as.numeric()
+db_data$latency <- as.numeric(db_data$latency)
+lat <- db_data[, c("latency")]
+lat[is.na(lat)] <- 24
+db_data[, c("latency")] <- lat
 
+db_data$rem_no <- as.numeric(db_data$rem_no)
+rem_no <- db_data[, c("rem_no")]
+rem_no[is.na(rem_no)] <- 0
+db_data[, c("rem_no")] <- rem_no
 ## --------------- CORRECT DATES -----------------------------------------------
 
 db_data$date <- mdy(db_data$date)
@@ -74,7 +79,30 @@ db_data$date <- mdy(db_data$date)
 db_data <- db_data %>% 
   drop_na(pair_id)
 
+## --------------- CREATE DF FOR REMOVAL EVENT AND LATENCY -------------------
+
+burn_rem <- db_data %>% 
+  select(pair_id, env_type, rem_event) %>% 
+  filter(env_type == "BURN") %>% 
+  select(-env_type) %>% 
+  rename(burn = rem_event)
+
+scrub_rem <- db_data %>% 
+  select(pair_id, env_type, rem_event) %>% 
+  filter(env_type == "SCRUB") %>% 
+  select(-env_type) %>% 
+  rename(scrub = rem_event)
+  
+norem <- burn_rem %>% 
+  merge(scrub_rem, by="pair_id") %>% 
+  unite("norempair", 2:3, sep = "") 
+
+norem$norempair[norem$norempair == '11'] <- '0'
+norem$norempair[norem$norempair == '01'] <- '0'
+norem$norempair[norem$norempair == '10'] <- '0'
+norem$norempair[norem$norempair == '00'] <- '1'
+
+db_data <- merge(db_data, norem, by="pair_id")
+
 ## --------------- SAVE CSV -----------------------------------------------
 write.csv(db_data, file = "02_Clean_data/dbenv_use.csv")
-
-
