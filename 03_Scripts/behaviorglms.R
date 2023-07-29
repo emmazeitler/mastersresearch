@@ -8,11 +8,16 @@ library(MuMIn)
 
 db_data <- read_csv("02_Clean_data/dbenv_use.csv")
 
+str(db_data)
+str(db_data_2)
+
 db_data <- db_data %>% 
   filter(!burn_season == "Spring")
 
 db_data_2 <- db_data %>% 
   filter(norempair == 0)
+
+class(db_data_2$rem_no)
   
 ## Removal Event ##
 
@@ -31,6 +36,10 @@ emmeans(modRem1, ~burn_season, type = "response") %>% as.data.frame()
 
 remProb <- emmeans(modRem1, pairwise~env_type | burn_season , type = "response")
 remOddsRatio <- remProb$contrasts %>% as.data.frame()
+
+remOddsRatio <- remOddsRatio %>% 
+  mutate(lcl = odds.ratio - SE*qnorm(0.975),
+         ucl = odds.ratio + SE*qnorm(0.975))
 
 # write_csv(remOddsRatio, "02_Clean_data/propRem_or.csv")
 
