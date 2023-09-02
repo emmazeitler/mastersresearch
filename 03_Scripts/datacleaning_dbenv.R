@@ -104,5 +104,7 @@ norem$norempair[norem$norempair == '00'] <- '1'
 
 db_data <- merge(db_data, norem, by="pair_id")
 
+table(db_data$burn_season)
+
 ## --------------- SAVE CSV -----------------------------------------------
 write.csv(db_data, file = "02_Clean_data/dbenv_use.csv")

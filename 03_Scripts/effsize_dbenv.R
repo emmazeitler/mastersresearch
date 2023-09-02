@@ -83,7 +83,6 @@ rm(list=setdiff(ls(), "db_data"))
 db_data <- read_csv("02_Clean_data/dbenv_use.csv")
 
 db_data2 <- db_data %>% 
-  filter(norempair == 0) %>% 
   select(pair_id, block_id, burn_season, env_type, latency, rem_event)
 
 remlat_b <- db_data2 %>% 

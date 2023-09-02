@@ -165,6 +165,7 @@ ggplot(data=noRem_cd)+
 ggsave("05_Figures/effsize_remNo_cd.jpg", height=10, width= 10)
 
 #### Latency - Log ratio ####
+seasoncolors1 <- c('#40394A','#845EC2','#242424')
 remlat.lr <- read_csv("02_Clean_data/remlat_lrmod.csv")
 
 ggplot() +
@@ -179,7 +180,7 @@ ggplot() +
                 width=.09,
                 lwd=1,
                 position=position_dodge(width=0.5))+
-  scale_fill_manual(values=firecolors1)+
+  scale_fill_manual(values=seasoncolors1)+
   xlab("Season of burn")+
   ylab("Effect size")+
   ggtitle("Latency until removal")+

@@ -37,6 +37,7 @@ remlat_lr <- read_csv("02_Clean_data/remLat_lr_raw.csv")
 remlat_lr <- remlat_lr %>% 
   filter(!burn.season == "Spring")
 
+
 mod.remlat.lr <- glmmTMB(data = remlat_lr, ln.ratio ~ burn.season + (1|pair_id) + (1|block_id), family=gaussian)
 
 res.remlat.lr <- simulateResiduals(fittedModel = mod.remlat.lr, n = 250)
@@ -47,4 +48,4 @@ Anova(mod.remlat.lr)
 summary(mod.remlat.lr)
 
 remlat_lrmod <- emmeans(mod.remlat.lr, ~burn.season) %>% as.data.frame()
-# write_csv(remlat_lrmod, "02_Clean_data/remlat_lrmod.csv")
+write_csv(remlat_lrmod, "02_Clean_data/remlat_lrmod.csv")

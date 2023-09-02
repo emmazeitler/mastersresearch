@@ -37,6 +37,10 @@ emmeans(modRem1, ~burn_season, type = "response") %>% as.data.frame()
 remProb <- emmeans(modRem1, pairwise~env_type | burn_season , type = "response")
 remOddsRatio <- remProb$contrasts %>% as.data.frame()
 
+emmeans(modRem1, pairwise~ burn_season | env_type, type = "response")
+emmeans(modRem1, pairwise~ burn_season, type = "response")
+
+
 remOddsRatio <- remOddsRatio %>% 
   mutate(lcl = odds.ratio - SE*qnorm(0.975),
          ucl = odds.ratio + SE*qnorm(0.975))
@@ -60,6 +64,10 @@ emmeans(modRemNo1, pairwise~env_type | burn_season , type = "response")
 
 test <- emmeans(modRemNo1, pairwise~env_type | burn_season , type = "response") %>% as.data.frame()
 
+emmeans(modRemNo1, pairwise~ burn_season | env_type, type = "response")
+emmeans(modRemNo1, pairwise~ burn_season, type = "response")
+
+
 ## Latency ##
 
 modLat <- glmmTMB(data = db_data_2, latency ~ env_type * burn_season + (1|block_id), family = gaussian)
@@ -69,13 +77,20 @@ hist(resLat)
 plot(resLat)
 
 testCategorical(resLat, db_data_2$burn_season)
+VarCorr(modLat)
+
+total.SD = sqrt(0.89107^2)
 
 Anova(modLat)
 summary(modLat)
 
 emmeans(modLat, ~env_type, type = "response")
 
-emmeans(modLat, pairwise~env_type | burn_season, type = "response")
+emmeans(modLat, pairwise~env_type | burn_season, type = "response", bias.adjust = TRUE, sigma = total.SD)
 
 emmeans(modLat, pairwise~burn_season, type = "response")
+
+emmeans(modLat, pairwise~ burn_season | env_type, type = "response")
+emmeans(modLat, pairwise~ burn_season, type = "response")
+
 
